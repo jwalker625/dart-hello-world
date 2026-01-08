@@ -4,6 +4,10 @@ import 'package:test/test.dart';
 
 void main() {
   group('dcat CLI', () {
+    test('prints lines from stdin, when no files provided', () {
+      final process = Process.start('dart', ['run', 'bin/dcat.dart']);
+    });
+
     test('prints numbered lines when -n', () async {
       final result = await Process.run('dart', [
         'run',
