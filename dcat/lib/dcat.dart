@@ -1,3 +1,34 @@
-int calculate() {
-  return 6 * 7;
+import 'dart:convert';
+import 'dart:io';
+
+Future<void> dcat(List<String> paths, {bool showLineNumbers = false}) async {
+  if (paths.isEmpty) {
+    // No files provided as arguments. Read from stdin and print each line.
+    await stdin.pipe(stdout);
+  } else {
+    for (final path in paths) {
+      var lineNumber = 1;
+      final lines = utf8.decoder
+          .bind(File(path).openRead())
+          .transform(LineSplitter());
+      try {
+        await for (final line in lines) {
+          if (showLineNumbers) {
+            stdout.write('${lineNumber++} ');
+          }
+          stdout.writeln(line);
+        }
+      } catch (_) {
+        await _handleError(path);
+      }
+    }
+  }
+}
+
+Future<void> _handleError(String path) async {
+  exitCode = 2;
+
+  if (await FileSystemEntity.isDirectory(path)) {
+    stderr.writeln('error: $path is a directory');
+  }
 }
