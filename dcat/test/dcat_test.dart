@@ -29,7 +29,7 @@ Third line here.
       });
     });
 
-    group('file provided as argument', () {
+    group('one file provided as argument', () {
       test('prints lines from file, when called with no flags', () async {
         final result = await Process.run('dart', [
           'run',
@@ -65,6 +65,17 @@ Third line here.
 3 Third line here.
 '''),
         );
+      });
+
+      test('prints nothing, when file is empty', () async {
+        final result = await Process.run('dart', [
+          'run',
+          'bin/dcat.dart',
+          'test/fixtures/empty.txt',
+        ]);
+
+        expect(result.exitCode, equals(0));
+        expect(result.stdout, isEmpty);
       });
     });
 
@@ -119,34 +130,50 @@ And its second line.
       );
     });
 
-    test(
-      'returns exit code 2, when unrecognized file provided as argument',
-      () async {
-        final result = await Process.run('dart', [
-          'run',
-          'bin/dcat.dart',
-          'nonexistent.txt',
-        ]);
+    group('invalid argument provided', () {
+      test(
+        'returns exit code 2, when unrecognized file provided as argument',
+        () async {
+          final result = await Process.run('dart', [
+            'run',
+            'bin/dcat.dart',
+            'nonexistent.txt',
+          ]);
 
-        expect(result.exitCode, equals(2));
-      },
-    );
+          expect(result.exitCode, equals(2));
+        },
+      );
 
-    test(
-      'prints error message to stderr, when directory provided as argument',
-      () async {
-        final result = await Process.run('dart', [
-          'run',
-          'bin/dcat.dart',
-          'test/fixtures',
-        ]);
+      test(
+        'returns exit code 2, when directory provided as argument',
+        () async {
+          final result = await Process.run('dart', [
+            'run',
+            'bin/dcat.dart',
+            'test/fixtures',
+          ]);
 
-        expect(
-          result.stderr,
-          equals('''
+          expect(result.exitCode, equals(2));
+        },
+      );
+
+      test(
+        'prints error message to stderr, when directory provided as argument',
+        () async {
+          final result = await Process.run('dart', [
+            'run',
+            'bin/dcat.dart',
+            'test/fixtures',
+          ]);
+
+          expect(
+            result.stderr,
+            equals('''
 error: test/fixtures is a directory
 '''),
-        );
+          );
+        },
+      );
     });
   });
 }

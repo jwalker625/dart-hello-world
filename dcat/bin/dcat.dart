@@ -40,9 +40,9 @@ Future<void> dcat(List<String> paths, {bool showLineNumbers = false}) async {
 }
 
 Future<void> _handleError(String path) async {
+  exitCode = 2;
+
   if (await FileSystemEntity.isDirectory(path)) {
     stderr.writeln('error: $path is a directory');
-  } else {
-    exitCode = 2;
   }
 }
